@@ -1,1 +1,1 @@
-### Coupon API
+### My Gigs API
