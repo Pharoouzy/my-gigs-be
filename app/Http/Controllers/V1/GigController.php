@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Models\Gig;
+use App\Models\Tag;
 use Illuminate\Http\Request;
-use App\Helpers\GigHelper;
 use App\Helpers\RequestHelper;
 
 /**
@@ -13,7 +13,7 @@ use App\Helpers\RequestHelper;
  */
 class GigController extends Controller {
 
-    use RequestHelper, GigHelper;
+    use RequestHelper;
 
     /**
      * @return \Illuminate\Http\JsonResponse
@@ -47,6 +47,28 @@ class GigController extends Controller {
 
     /**
      * @param Request $request
+     * @param $filter
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function filter(Request $request, $filter) {
+        $request['filter'] = $filter;
+        $validator = $this->customValidator($request, [
+            // 'filter' => 'required|string|exists:tags,name',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationError($validator);
+        }
+
+        $gigs = Tag::where('name', 'LIKE', '%'.$request->filter.'%')->with(['gigs'])->first();
+
+        if(!$gigs) $gigs = Tag::with(['gigs'])->first();
+
+        return $this->response('success', $gigs);
+    }
+
+    /**
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request) {
@@ -54,13 +76,13 @@ class GigController extends Controller {
         $validator = $this->customValidator($request, [
             'role' => 'required|string',
             'company_name' => 'required|string',
-            'country_id' => 'required|string|exists:countries,id',
-            'state_id' => 'required|string|exists:states,id',
+            'country_id' => 'required|integer|exists:countries,id',
+            'state_id' => 'required|integer|exists:states,id',
             'address' => 'required|string',
             'min_salary' => 'required|numeric|gt:0',
-            'max_salary' => 'required|numeric|gt:0',
+            'max_salary' => 'required|numeric|gt:min_salary',
             'tags' => 'required|array',
-            'tags.*' => 'required|string|exists:tags,id',
+            'tags.*' => 'required|string|exists:tags,name',
         ]);
 
         if ($validator->fails()) {
@@ -75,8 +97,12 @@ class GigController extends Controller {
             'state_id', 'address',
             'min_salary', 'max_salary'
         ]));
+        $tags = [];
 
-        $gig->tags()->sync($request->tags, true);
+        foreach($request->tags as $tag)
+            $tags[] = Tag::where('name', $tag)->first()->id;
+        
+        $gig->tags()->sync($tags, true);
 
         $data = Gig::where('id', $gig->id)->with(['country', 'state', 'tags'])->first();
 

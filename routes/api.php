@@ -26,6 +26,7 @@ Route::group(['namespace' => 'V1'], function () {
         Route::get('', 'GigController@index');
         Route::post('', 'GigController@store');
         Route::get('{gig}', 'GigController@get');
+        Route::get('filter/{filter}', 'GigController@filter');
         Route::patch('{gig}', 'GigController@update');
         Route::delete('{gig}', 'GigController@destroy');
     });
@@ -38,6 +39,11 @@ Route::group(['namespace' => 'V1'], function () {
         Route::get('{gig}', 'TagController@get');
         Route::patch('{gig}', 'TagController@update');
         Route::delete('{gig}', 'TagController@destroy');
+    });
+
+
+    Route::group(['prefix' => 'countries'], function () {
+        Route::get('', 'CountryController@index');
     });
 
 });

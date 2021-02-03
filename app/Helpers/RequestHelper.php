@@ -2,7 +2,7 @@
 /**
  * Created by PhpStorm.
  * User: umar-farouq
- * Date: 11/10/20
+ * Date: 02/02/21
  * Time: 00:51 AM
  */
 
@@ -29,7 +29,7 @@ trait RequestHelper {
      * @return \Illuminate\Http\JsonResponse
      */
     public function validateCustomError($errors) {
-        return $this->customResponse('failed', ['errors'=> $errors], 422);
+        return $this->customResponse('Validation Error', ['errors'=> $errors], 422);
     }
 
     /**

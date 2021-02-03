@@ -15,12 +15,19 @@ class TagController extends Controller
 {
     use RequestHelper;
 
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index() {
         $tags = Tag::orderBy('created_at', 'desc')->get();
 
         return $this->response('success', $tags);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request)
     {
         $validator = $this->customValidator($request, [
@@ -38,6 +45,11 @@ class TagController extends Controller
         return $this->response('success', $tag, 201);
     }
 
+    /**
+     * @param Request $request
+     * @param $tagId
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function get(Request $request, $tagId) {
         $request['tag_id'] = $tagId;
         $tag = Tag::find($request->tag_id);
@@ -53,6 +65,12 @@ class TagController extends Controller
         return $this->response('success', $tag);
     }
 
+    /**
+     * @param Request $request
+     * @param $tag
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
     public function update(Request $request, $tag) {
         $tag = Tag::find($tag);
 
@@ -65,6 +83,11 @@ class TagController extends Controller
         return $this->response('Tag updated successfully.', $tag);
     }
 
+    /**
+     * @param Request $request
+     * @param $tag
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function destroy(Request $request, $tag) {
 
         $request['tag'] = $tag;
