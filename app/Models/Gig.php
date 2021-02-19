@@ -11,6 +11,8 @@ class Gig extends Model
      */
     protected $primaryKey = 'id';
 
+    public $keyType = 'string';
+
     /**
      * @var bool
      */
